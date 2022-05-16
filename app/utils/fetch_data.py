@@ -4,6 +4,7 @@ from fredapi import Fred
 import json
 from pathlib import Path
 import requests
+import streamlist as st
 from .log import get_logger
 
 # auth
@@ -11,15 +12,15 @@ basepath = Path(__file__).parent.parent
 
 logger = get_logger(__name__)
 
-with open(str(basepath) + '/keys/keys.json', 'r') as key_file:
-    keys = json.load(key_file)
+# with open(str(basepath) + '/keys/keys.json', 'r') as key_file:
+#     keys = json.load(key_file)
 
-fred = Fred(api_key=keys['fred'])
+fred = Fred(api_key=st.secrets["fred"]["key"])
 
 def convert_date_format(d, format):
     """"
     input format for date should be 'YYYY-MM-DD'
-    format: fred, investing.com
+    format: fred, DMY
     """
     y, m, d = d.split('-')
 
@@ -27,7 +28,7 @@ def convert_date_format(d, format):
         return m + '/' + d + '/' + y
     elif format == 'YMD':
         return y + '-' + m + '-' + d
-    elif format == 'Investing.com':
+    elif format == 'DMY':
         return d + '/' + m + '/' + y
 
 
@@ -49,35 +50,6 @@ def fred_fred(code, observation_start=None, observation_end=None):
     return df
 
 
-def investing_api(call_type, ticker, from_date, to_date, country='united states'):
-    """
-    call_type: etf, stock, fund, index
-    ticker: str. ticker name
-    from_date: yyyy-mm--dd
-    to_date: yyyy-mm--dd
-    """
-
-    from_date = convert_date_format(from_date, 'Investing.com')
-    to_date = convert_date_format(to_date, 'Investing.com')
-
-    if call_type == 'etf':
-        logger.info("Fetching etf from investing_api: {}, from {} to {}".format(ticker, from_date, to_date))
-
-        # search name from ticker and return
-        etfs = investpy.etfs.get_etfs(country=country)
-        etf_name = etfs.loc[(etfs.symbol == ticker), 'name'].tolist()[0]
-        data = investpy.get_etf_historical_data(etf=etf_name, country=country,
-                                                from_date=from_date,
-                                                to_date=to_date).reset_index()
-    if call_type == 'stock':
-        logger.info("Fetching stock from investing_api: {}, from {} to {}".format(ticker, from_date, to_date))
-
-        data = investpy.stocks.get_stock_historical_data(stock=ticker, country=country,
-                                                         from_date=from_date,
-                                                         to_date=to_date).reset_index()
-    data.loc[:, 'ticker'] = ticker
-    data.loc[:, 'p_key'] = data['Date'].astype(str).str.replace("-", "_") + "_" + data['ticker']
-    return data
 
 #
 # def _plot_two_data(plot_type1, data1, x1, y1, plot_type2, data2, x2, y2):
