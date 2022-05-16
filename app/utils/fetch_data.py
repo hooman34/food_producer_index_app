@@ -3,8 +3,6 @@ import pandas as pd
 from fredapi import Fred
 import json
 from pathlib import Path
-import quandl
-import investpy
 import requests
 from .log import get_logger
 
