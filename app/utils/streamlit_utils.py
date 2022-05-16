@@ -5,6 +5,7 @@ from .log import get_logger
 
 logger = get_logger(__name__)
 
+@st.cache
 class fred:
     def __init__(self):
         self.fred = self._fred_auth()
