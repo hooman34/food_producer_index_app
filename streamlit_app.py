@@ -9,5 +9,5 @@ fred = fred()
 st.write(fred.food_options)
 
 food = st.selectbox(label="Select food", options=fred.food_options.food_name, key='food_option')
-st.write('You selected:', food)
+st.write('Type in the food you would like to see:', food)
 

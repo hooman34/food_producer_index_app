@@ -4,7 +4,7 @@ from fredapi import Fred
 import json
 from pathlib import Path
 import requests
-import streamlist as st
+import streamlit as st
 from .log import get_logger
 
 # auth
