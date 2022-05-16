@@ -20,5 +20,5 @@ def run_query(query):
 rows = run_query("SELECT * from fred_index;")
 
 # Print results.
-for row in rows:
+for row in rows[:10]:
     st.write(f"{row[0]} has a :{row[1]}:")
