@@ -16,3 +16,4 @@ sqlalchemy=1.4.32=py38hca72f7f_0
 sqlite=3.37.2=h707629a_0
 streamlit=1.9.0=pyhd8ed1ab_0
 typing_extensions=4.1.1=pyha770c72_0
+mysql-connector-python=8.0.29
