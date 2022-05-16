@@ -1,26 +1,26 @@
 import streamlit as st
 
 st.write("test")
-# import mysql.connector
+import mysql.connector
 
-# # Initialize connection.
-# # Uses st.experimental_singleton to only run once.
-# @st.experimental_singleton
-# def init_connection():
-#     return mysql.connector.connect(**st.secrets["mysql"])
+# Initialize connection.
+# Uses st.experimental_singleton to only run once.
+@st.experimental_singleton
+def init_connection():
+    return mysql.connector.connect(**st.secrets["mysql"])
 
-# conn = init_connection()
+conn = init_connection()
 
-# # Perform query.
-# # Uses st.experimental_memo to only rerun when the query changes or after 10 min.
-# @st.experimental_memo(ttl=600)
-# def run_query(query):
-#     with conn.cursor() as cur:
-#         cur.execute(query)
-#         return cur.fetchall()
+# Perform query.
+# Uses st.experimental_memo to only rerun when the query changes or after 10 min.
+@st.experimental_memo(ttl=600)
+def run_query(query):
+    with conn.cursor() as cur:
+        cur.execute(query)
+        return cur.fetchall()
 
-# rows = run_query("SELECT * from fred_index;")
+rows = run_query("SELECT * from fred_index;")
 
-# # Print results.
-# for row in rows[:10]:
-#     st.write(f"{row[0]} has a :{row[1]}:")
+# Print results.
+for row in rows[:10]:
+    st.write(f"{row[0]} has a :{row[1]}:")
