@@ -17,24 +17,6 @@ with open(str(basepath) + '/keys/keys.json', 'r') as key_file:
     keys = json.load(key_file)
 
 fred = Fred(api_key=keys['fred'])
-quandl.ApiConfig.api_key = keys['quandl']
-
-
-def fundamental_metric(soup, metric):
-    return soup.find(text=metric).find_next(class_='snapshot-td2').text
-
-
-def get_fundamental_data(df):
-    for symbol in df.index:
-        try:
-            url = ("http://finviz.com/quote.ashx?t=" + symbol.lower())
-            soup = bs(requests.get(url).content)
-            for m in df.columns:
-                df.loc[symbol, m] = fundamental_metric(soup, m)
-        except Exception as e:
-            print(symbol, 'not found')
-    return df
-
 
 def convert_date_format(d, format):
     """"
@@ -49,17 +31,6 @@ def convert_date_format(d, format):
         return y + '-' + m + '-' + d
     elif format == 'Investing.com':
         return d + '/' + m + '/' + y
-
-
-def fred_quandl(indx, start_date, end_date):
-    """
-    indx
-    start_date, end_date: 'YYYY-MM-DD'
-    """
-    df = quandl.get('FRED/' + indx, start_date=start_date, end_date=end_date)
-    df = df.reset_index()
-    df.columns = ['Date', indx]
-    return df
 
 
 def fred_fred(code, observation_start=None, observation_end=None):

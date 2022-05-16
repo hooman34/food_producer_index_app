@@ -1,26 +1,13 @@
 import streamlit as st
+from app.utils.fetch_data import *
+from app.utils.streamlit_utils import *
+from fredapi import Fred
 
-st.write("test")
-import mysql.connector
+# call fred class
+fred = fred()
 
-# Initialize connection.
-# Uses st.experimental_singleton to only run once.
-@st.experimental_singleton
-def init_connection():
-    return mysql.connector.connect(**st.secrets["mysql"])
+st.write(fred.food_options)
 
-conn = init_connection()
+food = st.selectbox(label="Select food", options=fred.food_options.food_name, key='food_option')
+st.write('You selected:', food)
 
-# Perform query.
-# Uses st.experimental_memo to only rerun when the query changes or after 10 min.
-@st.experimental_memo(ttl=600)
-def run_query(query):
-    with conn.cursor() as cur:
-        cur.execute(query)
-        return cur.fetchall()
-
-rows = run_query("SELECT * from fred_index;")
-
-# Print results.
-for row in rows[:10]:
-    st.write(f"{row[0]} has a :{row[1]}:")
