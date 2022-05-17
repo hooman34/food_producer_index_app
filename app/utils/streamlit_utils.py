@@ -1,3 +1,4 @@
+from datetime import date
 from app.utils.fetch_data import *
 from fredapi import Fred
 import streamlit as st
@@ -26,8 +27,10 @@ class fred:
         options = self.fred.search('Producer Price Index by Commodity: Farm Products').reset_index()
         options['food_name'] = options['title'].str.split(": ").str[-1]
         options['observation_start_year'] = options['observation_start'].dt.year
-        # filter out unwanted indexes
+        options['word_length'] = options['food_name'].str.split(" ").str.len()
+        # filter out unwanted indexes:
         options = options.loc[~options['food_name'].str.contains('DISCONTINUED')]
+        options = options.loc[options['word_length']<=2]
         options = options.loc[options['frequency_short']=='M']
         options = options.loc[options['seasonal_adjustment_short']=='NSA']
         # filter on data start year. choose oldest index if same food name
@@ -40,3 +43,33 @@ class fred:
         final = popular.drop_duplicates(subset=['food_name'])
 
         return final
+
+    def retrieve_code_from_food_name(self, food_list):
+        food_code_dict = self.food_options.loc[self.food_options['food_name'].isin(food_list), ['food_name', 'series id']].T.to_dict()
+        return food_code_dict
+
+    def collect_food_index(self, food_code_dict):
+        today = date.today().strftime("%Y-%m-%d")
+        food_index_data = dict()
+
+        for k,v in food_code_dict.items():
+            food_index_data[k] = fred_fred(v['series id'], observation_start='2000-01-01', observation_end=today)
+            food_index_data[k].rename(columns={"v":v[food_name]})
+
+        return food_index_data
+
+
+def create_plots(food_code_list):
+    """
+    Create plot based on user input.
+
+    Args:
+        plot_type:
+        plot_settings:
+
+    Returns:
+
+    """
+
+    _plot_two_data
+

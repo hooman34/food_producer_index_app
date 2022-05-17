@@ -49,38 +49,3 @@ def fred_fred(code, observation_start=None, observation_end=None):
     df.loc[:, 'p_key'] = df['date'].astype(str).str.replace("-", "_") + "_" + df['code']
     return df
 
-
-
-#
-# def _plot_two_data(plot_type1, data1, x1, y1, plot_type2, data2, x2, y2):
-#     trace1 = _create_trace(plot_typd1, data1, x1, y1)
-#     trace2 = _create_trace(plot_typd2, data2, x2, y2)
-#
-#     fig = make_subplots(specs=[[{"secondary_y": True}]])
-#     fig.add_trace(trace1)
-#     fig.add_trace(trace2, secondary_y=True)
-#
-#     fig.update_layout(legend=dict(
-#         orientation="h",
-#         yanchor="bottom",
-#         y=1.02,
-#         xanchor="right",
-#         x=1
-#     ))
-#
-#     return fig
-#
-#
-# def _create_trace(plot_type, data, x, y):
-#     """
-#     create trace
-#     """
-#     if plot_type == 'bar':
-#         trace = go.Bar(x=data[x],
-#                        y=data[y],
-#                        name=y)
-#     if plot_type == 'line':
-#         trace = go.Scatter(x=data[x],
-#                            y=data[y],
-#                            name=y)
-#     return trace
