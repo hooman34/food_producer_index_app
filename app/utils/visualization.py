@@ -4,7 +4,7 @@ from .log import get_logger
 
 logger = get_logger(__name__)
 
-def _plot_two_data(plot_type, plot_settings):
+def _plot_data(plot_type, plot_settings):
     """
     Create a plotly figure. The input should be a list of list.
     The inner list should be [dataset, x_column, y_column]
@@ -20,7 +20,7 @@ def _plot_two_data(plot_type, plot_settings):
 
     if plot_type=='line':
         for setting in plot_settings:
-            trace = _create_trace(plot_type1, setting[0], setting[1], setting[2])
+            trace = _create_trace(plot_type, setting[0], setting[1], setting[2])
             fig.add_trace(trace)
     elif plot_type=='bar':
         logger.info("bar graph not implemented")

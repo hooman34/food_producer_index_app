@@ -1,8 +1,10 @@
 from datetime import date
+import time
 from app.utils.fetch_data import *
 from fredapi import Fred
 import streamlit as st
 from .log import get_logger
+from app.utils.visualization import _plot_data
 
 logger = get_logger(__name__)
 
@@ -50,11 +52,15 @@ class fred:
 
     def collect_food_index(self, food_code_dict):
         today = date.today().strftime("%Y-%m-%d")
-        food_index_data = dict()
+        food_index_data = list()
 
         for k,v in food_code_dict.items():
-            food_index_data[k] = fred_fred(v['series id'], observation_start='2000-01-01', observation_end=today)
-            food_index_data[k].rename(columns={"v":v[food_name]})
+            time.sleep(1)
+            df = fred_fred(v['series id'], observation_start='2000-01-01', observation_end=today)
+            df.rename(columns={"v":v['food_name']}, inplace=True)
+
+            data_feature_list = [df, 'date', v['food_name']]
+            food_index_data.append(data_feature_list)
 
         return food_index_data
 
@@ -70,6 +76,8 @@ def create_plots(food_code_list):
     Returns:
 
     """
+    fig = _plot_data('line', food_code_list)
 
-    _plot_two_data
+    return fig
+
 
