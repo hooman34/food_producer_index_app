@@ -51,6 +51,7 @@ class fred:
         return food_code_dict
 
     def collect_food_index(self, food_code_dict):
+
         today = date.today().strftime("%Y-%m-%d")
         food_index_data = list()
 
@@ -59,8 +60,16 @@ class fred:
             df = fred_fred(v['series id'], observation_start='2000-01-01', observation_end=today)
             df.rename(columns={"v":v['food_name']}, inplace=True)
 
-            data_feature_list = [df, 'date', v['food_name']]
-            food_index_data.append(data_feature_list)
+            # check the % of missing values
+            num_recent_data_points = df.loc[df['date'].dt.date > datetime.date(2015, 1, 1), v['food_name']].shape[0]
+            num_missing_data_points = df.loc[df['date'].dt.date > datetime.date(2015, 1, 1), v['food_name']].isna().sum()
+            missing_perc = num_missing_data_points / num_recent_data_points
+
+            if  missing_perc < 0.3:
+                data_feature_list = [df, 'date', v['food_name']]
+                food_index_data.append(data_feature_list)
+            else:
+                st.info("{} not available due to insufficient data points.".format(v['food_name']))
 
         return food_index_data
 
