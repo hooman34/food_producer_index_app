@@ -1,4 +1,5 @@
 from datetime import date
+import datetime
 import time
 from app.utils.fetch_data import *
 from fredapi import Fred
