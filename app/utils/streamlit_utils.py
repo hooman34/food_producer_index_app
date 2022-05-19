@@ -1,16 +1,18 @@
 from datetime import date
 import datetime
 import time
-from app.utils.fetch_data import *
 from fredapi import Fred
 import streamlit as st
+import numpy as np
 from .log import get_logger
+from app.utils.fetch_data import *
 from app.utils.visualization import _plot_data
+from app.utils.forecasting import create_prophet_df, forecast_by_Prophet
 
 logger = get_logger(__name__)
 
 @st.cache
-class fred:
+class fred_processor:
     def __init__(self):
         self.fred = self._fred_auth()
         self.food_options = self.collect_food_options()
@@ -52,27 +54,88 @@ class fred:
         return food_code_dict
 
     def collect_food_index(self, food_code_dict):
+        """
+        Call the FRED api and collect the data
+
+        Args:
+            food_code_dict(dict):
+
+        Returns:
+            None
+        """
 
         today = date.today().strftime("%Y-%m-%d")
         food_index_data = list()
 
         for k,v in food_code_dict.items():
             time.sleep(1)
+            logger.info("Collecting selected index: {}".format(v['food_name']))
+
             df = fred_fred(v['series id'], observation_start='2000-01-01', observation_end=today)
             df.rename(columns={"v":v['food_name']}, inplace=True)
 
-            # check the % of missing values
-            num_recent_data_points = df.loc[df['date'].dt.date > datetime.date(2015, 1, 1), v['food_name']].shape[0]
-            num_missing_data_points = df.loc[df['date'].dt.date > datetime.date(2015, 1, 1), v['food_name']].isna().sum()
-            missing_perc = num_missing_data_points / num_recent_data_points
-
-            if  missing_perc < 0.3:
-                data_feature_list = [df, 'date', v['food_name']]
-                food_index_data.append(data_feature_list)
-            else:
-                st.info("{} not available due to insufficient data points.".format(v['food_name']))
+            data_feature_list = [df, 'date', v['food_name']]
+            food_index_data.append(data_feature_list)
 
         return food_index_data
+
+    def forecast(self, food_index_data, num_periods=1):
+        """
+        Predict the next month's price index.
+        The data point used for forecasting will start from 2015-01-01
+        The selected index will not go under prediction if the training dataset has more than 30% missing values
+
+        Args:
+            food_index_data(list): list of list of data
+
+        Returns:
+            forecast_results(dict): forecast values for each food index
+        """
+        forecast_results = dict()
+
+        for data, date_col, val_col in food_index_data:
+            # check if the data points are enough
+            # only use data after 2015-01-01
+            df = data.loc[data[date_col].dt.date > datetime.date(2015, 1, 1)].copy()
+            # check the % of missing values
+            num_recent_data_points = df.loc[:, val_col].shape[0]
+            num_missing_data_points = df.loc[:, val_col].isna().sum()
+            missing_perc = num_missing_data_points / num_recent_data_points
+
+            # start forecasting
+            if  missing_perc < 0.3:
+                prophet_df = create_prophet_df(df, date_col, val_col)
+                forecasts = forecast_by_Prophet(prophet_df, num_periods)
+                forecast_results[val_col] = forecasts['yhat'].tolist()
+            # pass
+            else:
+                st.info("{} not available due to insufficient data points.".format(val_col))
+
+        return forecast_results
+
+    def forecast_report(self, food_index_data, forecast_results):
+        """
+        Create simple insight reports informing about the prediction
+
+        Args:
+            forecast_results:
+
+        Returns:
+
+        """
+        # fetch last date data
+        for data, date_col, food_col in food_index_data:
+            if food_col in forecast_results.keys():
+                # price increase
+                last_index = data.loc[data[date_col] == data[date_col].max(), food_col].values[0]
+                future_index = forecast_results[food_col][0]
+                increase_perc = np.round(100*(future_index - last_index)/last_index, 2)
+
+                if increase_perc>0:
+                    increase_perc = "+" + str(increase_perc)
+                else:
+                    increase_perc = str(increase_perc)
+                st.info("Price for {} is expected to change this month by {}%".format(food_col, increase_perc))
 
 
 def create_plots(food_code_list):
