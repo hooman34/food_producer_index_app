@@ -1,6 +1,7 @@
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: osx-64
+pystan
 prophet==1.0
 fredapi==0.4.2
 investpy==1.0.8
