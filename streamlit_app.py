@@ -1,13 +1,33 @@
 import streamlit as st
 from app.utils.fetch_data import *
 from app.utils.streamlit_utils import *
+from PIL import Image
 from fredapi import Fred
+
+
+_, col2, _ = st.columns([1, 2, 1])
+with col2:
+    st.title("Tridge demo")
+_, _, col3 = st.columns([1, 2, 1])
+with col3:
+    st.text("Gieun Kwak")
+
+st.markdown("")
+st.markdown("")
+
+image = Image.open("app/other/tridge_image.PNG")
+st.image(image)
+st.markdown("")
+st.markdown("")
+st.markdown("")
+st.markdown("")
+st.markdown("")
 
 # call fred class
 fred = fred_processor()
 
 # select to create bar
-food = st.multiselect(label="Select the ingredients you usually order",
+food = st.multiselect(label="Select the ingredients you usually order. \nYou can click, or type in the text.",
                       options=fred.food_options.food_name, key='food_option')
 
 view_price_index = st.button("See price changes", key='view_price_index_button')
@@ -25,7 +45,10 @@ if view_price_index:
     fig = create_plots(food_index_data)
     st.plotly_chart(fig, use_container_width=True)
 
-    st.write('start forecasting')
+    _, col2, _ = st.columns([1, 2, 1])
+    # with col2:
+    st.subheader('Expected price change')
+
     forecast_results = fred.forecast(food_index_data)
 
     # write insight report
