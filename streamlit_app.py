@@ -15,7 +15,7 @@ with col3:
 st.markdown("")
 st.markdown("")
 
-image = Image.open("app/other/tridge_image.PNG")
+image = Image.open("./app/other/tridge_image.PNG")
 st.image(image)
 st.markdown("")
 st.markdown("")
