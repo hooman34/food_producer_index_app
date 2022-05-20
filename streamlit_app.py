@@ -3,7 +3,11 @@ from app.utils.fetch_data import *
 from app.utils.streamlit_utils import *
 from PIL import Image
 from fredapi import Fred
+import requests
+from io import BytesIO
 
+response = requests.get("https://github.com/hooman34/tridge_demo/blob/main/app/other/tridge_image.png?raw=true")
+image = Image.open(BytesIO(response.content))
 
 _, col2, _ = st.columns([1, 2, 1])
 with col2:
@@ -15,7 +19,7 @@ with col3:
 st.markdown("")
 st.markdown("")
 
-image = Image.open("./app/other/tridge_image.PNG")
+# image = Image.open("./app/other/tridge_image.PNG")
 st.image(image)
 st.markdown("")
 st.markdown("")
