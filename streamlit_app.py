@@ -11,7 +11,7 @@ image = Image.open(BytesIO(response.content))
 
 _, col2, _ = st.columns([1, 2, 1])
 with col2:
-    st.title("Tridge demo")
+    st.title("Food price index viewer")
 _, _, col3 = st.columns([1, 2, 1])
 with col3:
     st.text("Gieun Kwak")
