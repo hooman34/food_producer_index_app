@@ -6,7 +6,7 @@ from fredapi import Fred
 import requests
 from io import BytesIO
 
-response = requests.get("https://github.com/hooman34/tridge_demo/blob/main/app/other/tridge_image.png?raw=true")
+response = requests.get("https://github.com/hooman34/food_producer_index_app/blob/main/app/other/tridge_image.png?raw=true")
 image = Image.open(BytesIO(response.content))
 
 _, col2, _ = st.columns([1, 2, 1])
